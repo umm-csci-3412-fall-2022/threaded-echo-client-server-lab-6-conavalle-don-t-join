@@ -18,21 +18,17 @@ public class EchoServer {
 	private void start() throws IOException, InterruptedException {
 	try{
 		ServerSocket sock = new ServerSocket(PORT_NUMBER);
+		Thread[] listThreads = new Thread[10];
+		int index = 0;
 		while (true) {
+			if(index < 10){
 			Socket client = sock.accept();
-        		System.out.println("Got a request!");
-        		OutputStream os = client.getOutputStream();
-        		InputStream is = client.getInputStream();
-			int c;
-      // echos what the client sends back to the client
-      while ((c = is.read()) != -1) {
-          os.write((byte)c);
-          os.flush();
-      }
-      //Disconnect from the client
-      client.close();
-      System.out.println("Client Disconnected");
-
+			System.out.println("Client Accepted");
+			listThreads[index] = new Thread(new clientThread(client));
+			listThreads[index].start();
+			index++;
+			}
+			else System.out.println("Not cool man"); 
 	}
     } catch (Exception e) {
 	    System.err.println("Exception:  " + e);
@@ -44,5 +40,39 @@ public class EchoServer {
 			//   * Construct a Thread with your runnable
 			//      * Or use a thread pool
 	}		//   * Start that thread
+
+
+	public class clientThread implements Runnable {
+		Socket client;
+		OutputStream os;
+		InputStream is;
+		int c;
 	
+		public clientThread(Socket inClient){
+			try{
+				this.client = inClient;
+				os = client.getOutputStream();
+				is = client.getInputStream();
+			} catch (Exception e) {
+				System.err.println("Exception:  " + e);
+			  }
+			
+		}
+
+		@Override
+		public void run (){
+			try {
+			while((c = is.read()) != -1){
+				os.write((byte)c);
+				os.flush();
+			}
+			client.close();
+			System.out.println("Client Disconnected");
+		} catch (Exception e) {
+			System.err.println("Exception:  " + e);
+		  }
+
+		}
+	
+	}	
 }
