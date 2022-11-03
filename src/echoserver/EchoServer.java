@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 
 public class EchoServer {
 	
@@ -17,18 +20,20 @@ public class EchoServer {
 
 	private void start() throws IOException, InterruptedException {
 	try{
+		int MAX_T = 3;
+
 		ServerSocket sock = new ServerSocket(PORT_NUMBER);
-		Thread[] listThreads = new Thread[10];
-		int index = 0;
-		while (true) {
-			if(index < 10){
-			Socket client = sock.accept();
-			System.out.println("Client Accepted");
-			listThreads[index] = new Thread(new clientThread(client));
-			listThreads[index].start();
-			index++;
-			}
-			else System.out.println("Not cool man"); 
+		
+ 		ExecutorService pool = Executors.newFixedThreadPool(MAX_T);
+		
+		while (true){
+		Socket client = sock.accept();
+                System.out.println("Client Accepted");
+	        Runnable cthread = new clientThread(client);
+		pool.execute(cthread);
+		
+		
+		
 	}
     } catch (Exception e) {
 	    System.err.println("Exception:  " + e);
