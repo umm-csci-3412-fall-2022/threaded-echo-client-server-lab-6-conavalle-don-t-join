@@ -24,13 +24,15 @@ public class EchoClient {
 			Thread coolerNewerAnderFresherThreader = new Thread(new writer(os));
 			coolerNewerAnderFresherThreader.start();
 			coolerNewerAnderFresherThreader.join();
+			socket.shutdownOutput();
 			coolNewAndFreshThread.join();
 			// flush out the last bit of info beofre we shutdown
 			os.flush();
 			System.out.flush();
 			// We shutdown the connection instead of closing the socket
-			socket.shutdownOutput();
+
 			socket.shutdownInput();
+			socket.close();
 		} catch (Exception e) {
 			System.err.println("Exception:  " + e);
 		}
@@ -54,7 +56,6 @@ public class EchoClient {
 			} catch (Exception e) {
 				System.err.println("The Exception thing");
 			}
-
 		}
 
 	}
